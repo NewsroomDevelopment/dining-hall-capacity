@@ -5,9 +5,10 @@ from dotenv import load_dotenv, find_dotenv
 import os
 import requests
 
-#get capacity percentages
-def get_capacity(hall):
-  return int(crowd_data['data'][str(hall)]['client_count'])/int(dining_halls[hall]['max_size'])
+# get capacity percentages
+def get_capacity(crowd_size, max_size):
+    return str(round(int(crowd_size)/int(max_size), 2))
+
 
 # Load environment variables
 load_dotenv(os.getenv('MDB_PASSWORD'))
@@ -15,32 +16,23 @@ load_dotenv(os.getenv('MDB_PASSWORD'))
 # Connect to MongoDB
 MDB_USERNAME = os.getenv('MDB_USERNAME')
 MDB_PASSWORD = os.getenv('MDB_PASSWORD')
-
 MDB_URI = f'mongodb+srv://{MDB_USERNAME}:{MDB_PASSWORD}@capacitydata.tmbif.mongodb.net/capacityData?retryWrites=true&w=majority'
 
 client = MongoClient(MDB_URI)
 
-#Get JSON Files
+# Get JSON Files
 crowdedness_site = "https://dining.columbia.edu/cu_dining/rest/crowdedness"
-dining_site = "https://dining.columbia.edu/sites/default/files/cu_dining/cu_dining_nodes.json"
 
 crowd_data_r = requests.get(crowdedness_site)
-dining_data_r = requests.get(dining_site)
 
 crowd_data = []
-dining_data = []
 
 if crowd_data_r.status_code == 403:
-  print("failed fetch")
+    print("failed fetch. Please retry.")
 else:
-  crowd_data = crowd_data_r.json()
+    crowd_data = crowd_data_r.json()['data']
 
-if dining_data_r.status_code == 403:
-  print("failed fetch")
-else:
-  dining_data = dining_data_r.json()
-
-#Dining Parameters
+# Dining Parameters
 dining_halls = {
     155: {
         'name': 'John Jay Dining Hall',
@@ -48,7 +40,7 @@ dining_halls = {
     },
     192: {
         'name': 'JJ\'s place',
-        'max_size': 104 
+        'max_size': 104
     },
     104: {
         'name': 'Ferris Booth Commons',
@@ -56,14 +48,19 @@ dining_halls = {
     }
 }
 
-#Get Data
-for hall in dining_halls:
-  capacity = dining_halls[hall]['name'] + ": " + str(get_capacity(hall))
-  dining_halls[hall]['capacity'] = capacity
+data_obj = {
+    '_id': str(pd.Timestamp.today())
+}
+# Get Data
+for key, info in dining_halls.items():
+    client_count = crowd_data[str(key)]['client_count']
+    max_size = info['max_size']
+    data_obj[info['name']] = {
+        'client_count': client_count,
+        'capacity': get_capacity(client_count, max_size)
+    }
 
-current_time = str(pd.Timestamp.today())
 
 db = client["dining_hall_data"]
-collection = db[current_time]
-collection.insert_one(dining_halls)
-
+collection = db['data']
+collection.insert_one(data_obj)

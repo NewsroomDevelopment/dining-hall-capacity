@@ -1,11 +1,15 @@
 from utils import *
-import pandas as pd
 from pymongo import MongoClient
 from dotenv import load_dotenv, find_dotenv
+from datetime import datetime
+from datetime import timezone as tz
+from pytz import timezone, utc
 import os
 import requests
 
 # get capacity percentages
+
+
 def get_capacity(crowd_size, max_size):
     return str(round(int(crowd_size)/int(max_size), 2))
 
@@ -48,8 +52,12 @@ dining_halls = {
     }
 }
 
+current_time = datetime.utcnow().replace(tzinfo=utc)
+current_time = current_time.astimezone(
+    timezone('US/Eastern')).strftime("%Y-%m-%d %H:%M:%S")
+
 data_obj = {
-    '_id': str(pd.Timestamp.today())
+    '_id': str(current_time)
 }
 # Get Data
 for key, info in dining_halls.items():
@@ -63,4 +71,4 @@ for key, info in dining_halls.items():
 
 db = client["dining_hall_data"]
 collection = db['data']
-collection.insert_one(data_obj)
+# collection.insert_one(data_obj)

@@ -65,5 +65,5 @@ current_time = str(pd.Timestamp.today())
 
 db = client["dining_hall_data"]
 collection = db[current_time]
-collection.insert_many(dining_halls)
+collection.insert_one(dining_halls)
 

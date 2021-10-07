@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 utils = "*"
+pandas = "*"
 
 [dev-packages]
 

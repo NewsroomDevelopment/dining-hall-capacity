@@ -6,9 +6,10 @@ name = "pypi"
 [packages]
 utils = "*"
 pandas = "*"
-pymongo = "*"
+pymongo = {extras = ["srv"], version = "*"}
 requests = "*"
 python-dotenv = "*"
+dnspython = "*"
 
 [dev-packages]
 

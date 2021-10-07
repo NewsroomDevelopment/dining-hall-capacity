@@ -1,9 +1,7 @@
 from utils import *
 import pandas as pd
-import json
 from pymongo import MongoClient
 from dotenv import load_dotenv, find_dotenv
-from pprint import pprint
 import os
 import requests
 

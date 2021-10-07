@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 utils = "*"
 pandas = "*"
+pymongo = "*"
+requests = "*"
 
 [dev-packages]
 

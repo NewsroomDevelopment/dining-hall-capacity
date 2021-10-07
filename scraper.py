@@ -71,4 +71,4 @@ for key, info in dining_halls.items():
 
 db = client["dining_hall_data"]
 collection = db['data']
-# collection.insert_one(data_obj)
+collection.insert_one(data_obj)
